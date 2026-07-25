@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم | KING AL QMISHI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="glass-panel border-0" id="sidebar-wrapper" style="width: 250px; min-height: 100vh; position: fixed; right: 0; top: 0; padding: 20px;">
+            <div class="sidebar-heading text-center mb-4">
+                <h4 class="neon-text">QMISHI ADMIN</h4>
+                <small class="text-white-50">KING AL QMISHI</small>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="#" class="list-group-item list-group-item-action bg-transparent text-white active" onclick="showTab('dashboard')"><i class="fas fa-tachometer-alt me-2"></i> لوحة التحكم</a>
+                <a href="#" class="list-group-item list-group-item-action bg-transparent text-white" onclick="showTab('countries')"><i class="fas fa-globe me-2"></i> إدارة الدول</a>
+                <a href="#" class="list-group-item list-group-item-action bg-transparent text-white" onclick="showTab('users')"><i class="fas fa-users me-2"></i> المستخدمين</a>
+                <a href="#" class="list-group-item list-group-item-action bg-transparent text-white" onclick="showTab('settings')"><i class="fas fa-cog me-2"></i> الإعدادات</a>
+                <a href="index.html" class="list-group-item list-group-item-action bg-transparent text-warning mt-5"><i class="fas fa-arrow-right me-2"></i> العودة للموقع</a>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper" style="margin-right: 250px; width: 100%; padding: 30px;">
+            <div class="container-fluid">
+                <!-- Dashboard Tab -->
+                <div id="tab-dashboard" class="tab-content">
+                    <h2 class="neon-text mb-4">نظرة عامة</h2>
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-3"><div class="glass-panel p-3 text-center"><h3 class="text-warning" id="stat-users">0</h3><p>المستخدمين</p></div></div>
+                        <div class="col-md-3"><div class="glass-panel p-3 text-center"><h3 class="text-warning" id="stat-countries">0</h3><p>الدول</p></div></div>
+                        <div class="col-md-3"><div class="glass-panel p-3 text-center"><h3 class="text-warning" id="stat-visits">0</h3><p>الزيارات</p></div></div>
+                    </div>
+                    <div class="glass-panel p-4">
+                        <canvas id="analyticsChart" height="100"></canvas>
+                    </div>
+                </div>
+
+                <!-- Countries Tab -->
+                <div id="tab-countries" class="tab-content d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="neon-text">إدارة الدول</h2>
+                        <button class="btn btn-gold" onclick="openCountryModal()"><i class="fas fa-plus"></i> إضافة دولة</button>
+                    </div>
+                    <div class="glass-panel p-3">
+                        <table class="table table-dark table-hover mb-0">
+                            <thead><tr><th>العلم</th><th>الدولة</th><th>الكود</th><th>الإجراءات</th></tr></thead>
+                            <tbody id="countriesTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Settings Tab -->
+                <div id="tab-settings" class="tab-content d-none">
+                    <h2 class="neon-text mb-4">إعدادات الموقع</h2>
+                    <div class="glass-panel p-4">
+                        <form id="settingsForm">
+                            <div class="mb-3">
+                                <label>اسم الموقع</label>
+                                <input type="text" class="form-control form-control-glass" id="siteName" value="QMISHI NUMBERS">
+                            </div>
+                            <div class="mb-3">
+                                <label>رقم الواتساب الافتراضي</label>
+                                <input type="text" class="form-control form-control-glass" id="whatsappNumber" value="967783916451">
+                            </div>
+                            <button type="button" class="btn btn-gold" onclick="saveSettings()">حفظ التغييرات</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Country Modal -->
+    <div class="modal fade" id="countryModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background: #1a1a1a; border: 1px solid var(--gold); color: white;">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">إضافة دولة جديدة</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addCountryForm">
+                        <input type="text" id="cNameAr" class="form-control form-control-glass mb-3" placeholder="الاسم بالعربية" required>
+                        <input type="text" id="cNameEn" class="form-control form-control-glass mb-3" placeholder="الاسم بالإنجليزية" required>
+                        <input type="text" id="cCode" class="form-control form-control-glass mb-3" placeholder="كود الدولة (مثال: +967)" required>
+                        <input type="number" id="cNumbers" class="form-control form-control-glass mb-3" placeholder="عدد الأرقام المتاحة" required>
+                        <button type="submit" class="btn btn-gold w-100">حفظ</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { db, collection, addDoc, getDocs, deleteDoc, doc } from './js/firebase.js';
+
+        window.showTab = (tabName) => {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('d-none'));
+            document.getElementById(`tab-${tabName}`).classList.remove('d-none');
+            if(tabName === 'countries') loadCountriesTable();
+            if(tabName === 'dashboard') loadStats();
+        };
+
+        window.openCountryModal = () => new bootstrap.Modal(document.getElementById('countryModal')).show();
+
+        async function loadCountriesTable() {
+            const tbody = document.getElementById('countriesTableBody');
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center">جاري التحميل...</td></tr>';
+            const snapshot = await getDocs(collection(db, "countries"));
+            tbody.innerHTML = '';
+            snapshot.forEach(docSnap => {
+                const data = docSnap.data();
+                tbody.innerHTML += `
+                    <tr>
+                        <td><img src="${data.flagUrl || 'https://via.placeholder.com/30'}" width="30" class="rounded-circle"></td>
+                        <td>${data.nameAr}</td>
+                        <td>${data.code}</td>
+                        <td>
+                            <button class="btn btn-sm btn-danger" onclick="deleteCountry('${docSnap.id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        window.deleteCountry = async (id) => {
+            if(confirm('هل أنت متأكد من الحذف؟')) {
+                await deleteDoc(doc(db, "countries", id));
+                loadCountriesTable();
+            }
+        };
+
+        document.getElementById('addCountryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await addDoc(collection(db, "countries"), {
+                nameAr: document.getElementById('cNameAr').value,
+                nameEn: document.getElementById('cNameEn').value,
+                code: document.getElementById('cCode').value,
+                availableNumbers: document.getElementById('cNumbers').value,
+                flagUrl: 'https://via.placeholder.com/100' // يمكن ربطه بـ Firebase Storage لاحقاً
+            });
+            bootstrap.Modal.getInstance(document.getElementById('countryModal')).hide();
+            loadCountriesTable();
+            Swal.fire('تم', 'تمت إضافة الدولة بنجاح', 'success');
+        });
+
+        async function loadStats() {
+            const users = await getDocs(collection(db, "users"));
+            document.getElementById('stat-users').innerText = users.size;
+            const countries = await getDocs(collection(db, "countries"));
+            document.getElementById('stat-countries').innerText = countries.size;
+            
+            // Chart.js
+            new Chart(document.getElementById('analyticsChart'), {
+                type: 'line',
+                data: {
+                    labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+                    datasets: [{
+                        label: 'الطلبات',
+                        data: [12, 19, 3, 5, 2, 3],
+                        borderColor: '#D4AF37',
+                        backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                        fill: true
+                    }]
+                },
+                options: { plugins: { legend: { labels: { color: 'white' } } }, scales: { y: { ticks: { color: 'white' } }, x: { ticks: { color: 'white' } } } }
+            });
+        }
+
+        window.saveSettings = () => Swal.fire('تم الحفظ', 'تم تحديث إعدادات الموقع', 'success');
+        
+        // Initial load
+        loadStats();
+    </script>
+</body>
+</html>

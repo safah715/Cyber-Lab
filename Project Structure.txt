@@ -1,0 +1,31 @@
+qmishi-numbers/
+├── server/
+│   ├── package.json
+│   ├── .env
+│   ├── server.js
+│   └── middleware/
+│       └── security.js
+├── public/
+│   ├── index.html
+│   ├── login.html
+│   ├── register.html
+│   ├── country.html
+│   ├── contact.html
+│   ├── admin.html
+│   ├── manifest.json
+│   ├── sw.js
+│   ├── assets/
+│   │   ├── images/ (يتم الرفع هنا عبر الأدمن)
+│   │   └── icons/
+│   ├── css/
+│   │   ├── style.css
+│   │   ├── login.css
+│   │   └── admin.css
+│   └── js/
+│       ├── firebase.js
+│       ├── auth.js
+│       ├── main.js
+│       └── admin.js
+├── firebase/
+│   └── firestore.rules
+└── README.md
